@@ -13,6 +13,7 @@ import data.ImageEntity
 import data.ImageNetwork
 import data.ImageRepo
 import data.toImageEntity
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import viewmodel.ImageViewmodel
 
@@ -56,10 +57,5 @@ class ImageRemoteMediator(
 
         }
 
-    }
-
-    override suspend fun initialize(): InitializeAction {
-        imageDatabase.ImageDao().clearAll()
-        return super.initialize()
     }
 }

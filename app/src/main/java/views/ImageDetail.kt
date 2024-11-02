@@ -1,10 +1,14 @@
 package views
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.Icon
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,15 +31,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.size.Size
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.coil.CoilImage
 import com.yash.weebo.R
-import com.yash.weebo.SEARCH
 import org.koin.androidx.compose.koinViewModel
 import viewmodel.ImageViewmodel
 
@@ -43,6 +55,7 @@ import viewmodel.ImageViewmodel
     @Composable
     fun ImageDetail(
         modifier: Modifier = Modifier,
+        painter: String?,
         url: String,
         copyright: String?,
         character: String?,
@@ -54,107 +67,44 @@ import viewmodel.ImageViewmodel
     ) {
         val tagList = tagString?.split(" ")
         val viewmodel: ImageViewmodel = koinViewModel()
+    val painter = rememberAsyncImagePainter(
+        ImageRequest.Builder(LocalContext.current)
+            .data(url)
+            .size(Size.ORIGINAL)
+            .build()
+    )
         var hideUI by remember {
             mutableStateOf(false)
         }
         Scaffold(
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(text = "Weebo")
-                    },
-                    navigationIcon = {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "back arrow"
-                        )
-                        Modifier.clickable(onClick = { navHostController.popBackStack() })
-                    }
-                )
-            },
             content = {
-                Column(
-                    modifier
-                        .padding(it)
-                        .fillMaxSize()
-                        .verticalScroll(
-                            rememberScrollState()
+                Column(Modifier.padding(it).fillMaxSize().scrollable(enabled = true, orientation = Orientation.Horizontal, state = rememberScrollState())) {
+                    Row(Modifier.fillMaxSize()) {
+                        CoilImage(
+                            imageRequest = { painter.request },
+                            Modifier.fillMaxSize(),
+                            imageOptions = ImageOptions(
+                                contentScale = ContentScale.FillWidth,
+                            ),
                         )
-                        .clickable(
+                        Icon(painter = painterResource(R.drawable.baseline_arrow_downward_24),"Downloads", modifier = Modifier.clickable(
                             onClick = {
-                                hideUI != hideUI
-                            }
-                        )
-                ) {
-//                AsyncImage(model = url, contentDescription = null, Modifier.weight(9f))
-//                AnimatedVisibility(visible = hideUI) {
-//                    Text(text = "Anime name : $copyright",Modifier.weight(1f))
-                    AsyncImage(
-                        model = url, contentDescription = null, modifier.fillMaxWidth(),
-                        contentScale = ContentScale.FillWidth
-                    )
-                    Spacer(
-                        modifier = Modifier
-                            .height(15.dp)
-                            .fillMaxWidth()
-                    )
-                    FlowRow {
-                        Text(
-                            text = "Anime name : $copyright",
-                            Modifier.padding(10.dp)
-                        )
-                        Button(
-                            onClick = {
-                                viewmodel.downloadFile(
-                                    url,
-                                    character.toString(),
+                                viewmodel.downloadFile(url, character.toString()+copyright.toString(),
                                     fileType.toString()
                                 )
-                            }) {
-                            Icon(
-                                painter = painterResource(R.drawable.baseline_arrow_downward_24),
-                                contentDescription = "Downloads"
-                            )
-                        }
-                    }
-                    Spacer(
-                        modifier = Modifier
-                            .height(15.dp)
-                            .fillMaxWidth()
-                    )
-                    Text(
-                        text = "Character : $character",
-                        Modifier.padding(10.dp)
-                    )
-                    Spacer(
-                        modifier = Modifier
-                            .height(15.dp)
-                            .fillMaxWidth()
-                    )
-                    FlowRow(
-                        Modifier
-                            .padding(10.dp)
-                            .padding(5.dp)
-                    ) {
-                        if (tagList != null) {
-                            for (tag in tagList) {
-                                SuggestionChip(onClick = {
-                                    navHostController.navigate(SEARCH(tag))
-                                }, label = { Text(text = tag) })
                             }
-                        }
+                        ))
                     }
-                    Spacer(
-                        modifier = Modifier
-                            .height(15.dp)
-                            .fillMaxWidth()
-                    )
-                    Text(
-                        text = "artist : $artist",
-                        Modifier.padding(15.dp)
-                    )
-//                }
                 }
+            },
+            bottomBar = {
+                Icon(painter = painterResource(R.drawable.baseline_arrow_downward_24),"Downloads", modifier = Modifier.clickable(
+                    onClick = {
+                        viewmodel.downloadFile(url, character.toString()+copyright.toString(),
+                            fileType.toString()
+                        )
+                    }
+                ))
             }
         )
     }

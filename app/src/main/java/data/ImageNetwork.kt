@@ -1,10 +1,10 @@
 package data
 
+import androidx.compose.runtime.Immutable
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
 
 @Serializable
 data class ImageNetwork(
@@ -44,9 +44,10 @@ data class MediaAsset (
 
 )
 
+
+@Immutable
 @Serializable
 data class Variants (
-
     @SerialName("type"     ) var type    : String? = null,
     @SerialName("url"      ) var url     : String? = null,
     @SerialName("width"    ) var width   : Int?    = null,

@@ -8,14 +8,14 @@ plugins {
 
 android {
     namespace = "com.yash.weebo"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.yash.weebo"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0-alpha"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -25,7 +25,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -76,8 +76,6 @@ dependencies {
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.cio)
 
-    implementation(libs.coil.compose)
-
     implementation(libs.room.runtime)
     implementation(libs.androidx.adaptive.android)
     ksp(libs.room.compiler)
@@ -90,6 +88,12 @@ dependencies {
     implementation(libs.navigation)
 
     implementation(libs.androidx.datastore.preferences)
+
+    implementation(libs.landscapist)
+
+    implementation(libs.landscapist.transformation)
+
+    implementation(libs.coil.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

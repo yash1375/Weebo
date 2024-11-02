@@ -9,7 +9,8 @@ import data.toImageEntity
 
 class SeachgTagImage(
     val search : String,
-    val imageRepo: ImageRepo
+    val imageRepo: ImageRepo,
+    val nsfw : Boolean
 ) : PagingSource<Int, ImageEntity>() {
     override fun getRefreshKey(state: PagingState<Int, ImageEntity>): Int? {
         return state.anchorPosition
@@ -18,7 +19,13 @@ class SeachgTagImage(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ImageEntity> {
         val currentPage = params.key ?: 1
         return try {
-            val response = imageRepo.getPost(currentPage,60,search)
+            val response =
+                if (nsfw) {
+                    imageRepo.getPost(currentPage, 60, search).filter { it.rating == 'g' }
+                }
+            else {
+                    imageRepo.getPost(currentPage, 60, search)
+                }
             val endOfPage = response.size
             if (response.isNotEmpty()){
                 LoadResult.Page(

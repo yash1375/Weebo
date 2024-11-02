@@ -17,7 +17,7 @@ import com.yash.weebo.SETTING
 
 val listitem = listOf(
     BottomNavigationItem.HOME,
-    BottomNavigationItem.SEARCH,
+    BottomNavigationItem.FAV,
     BottomNavigationItem.SETTING
 )
 

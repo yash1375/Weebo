@@ -7,10 +7,10 @@ import android.content.Context
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.disk.DiskCache
-import coil.memory.MemoryCache
 import coil.request.CachePolicy
 import coil.util.DebugLogger
 import di.myModule
+import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -33,7 +33,6 @@ class ModelApplication: Application(),ImageLoaderFactory {
 
     override fun newImageLoader(): ImageLoader {
         return ImageLoader(this).newBuilder()
-            .crossfade(true)
             .diskCachePolicy(CachePolicy.ENABLED)
             .diskCache {
                 DiskCache.Builder()
@@ -41,12 +40,9 @@ class ModelApplication: Application(),ImageLoaderFactory {
                     .directory(cacheDir)
                     .build()
             }
-            .memoryCachePolicy(CachePolicy.ENABLED)
-            .memoryCache {
-                MemoryCache.Builder(this)
-                    .maxSizePercent(0.1)
-                    .build()
-            }
+            .memoryCachePolicy(CachePolicy.DISABLED)
+            .dispatcher(Dispatchers.IO)
+            .logger(DebugLogger())
             .build()
     }
 
